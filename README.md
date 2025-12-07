@@ -39,20 +39,22 @@ In game theory, a **Nash equilibrium** strategy is one where no player can impro
 
 ## Project Overview
 
-This repository implements three different approaches to learning optimal poker strategies:
+This repository implements multiple approaches to learning optimal poker strategies:
 
 1. **MCCFR (Monte Carlo Counterfactual Regret Minimization)**: A game-theoretic approach that converges to Nash equilibrium strategies
 2. **DQN (Deep Q-Network)**: A deep reinforcement learning method using value function approximation
 3. **NFSP (Neural Fictitious Self-Play)**: Combines deep learning with fictitious play to learn approximate Nash equilibria
+4. **NFSP v2 (NFSP with Reward Shaping)**: Enhanced NFSP with pot-aware reward shaping to address profitability issues
 
 ## Repository Structure
 
 ```
 RL-Poker-Bot/
-├── README.md           # This file
-├── MCCFR.ipynb         # Monte Carlo Counterfactual Regret Minimization implementation
-├── DQN.ipynb           # Deep Q-Network implementation
-└── NFSP.ipynb          # Neural Fictitious Self-Play implementation
+├── README.md              # This file
+├── MCCFR.ipynb            # Monte Carlo Counterfactual Regret Minimization implementation
+├── DQN.ipynb              # Deep Q-Network implementation
+├── NFSP.ipynb             # Neural Fictitious Self-Play implementation
+└── NFSP - version 2.ipynb # NFSP with Pot-Aware Reward Shaping
 ```
 
 ## Algorithms
@@ -126,6 +128,38 @@ NFSP combines deep reinforcement learning with fictitious play, where agents lea
 # Run all cells in the notebook
 ```
 
+### 4. Neural Fictitious Self-Play v2 (NFSP with Reward Shaping)
+
+**File**: `NFSP - version 2.ipynb`
+
+An enhanced version of NFSP that addresses the "calling station problem" through pot-aware reward shaping. This version is designed to improve the agent's ability to make profitable decisions by emphasizing pot-odds awareness.
+
+**Key Features**:
+- All features from standard NFSP
+- **Pot-Aware Reward Shaping**: Addresses the problem where agents win many hands but lose money overall
+- Enhanced reward structure that:
+  - Provides bonuses for winning large pots
+  - Applies stronger penalties for losing large pots
+  - Encourages value betting in significant pots
+  - Discourages calling station behavior
+- Enhanced diagnostics for win/loss ratio analysis
+- Action distribution tracking
+
+**Key Improvements**:
+- Addresses the "calling station" problem (high win rate but negative BB/100)
+- Pot-size aware reward shaping with exponential scaling
+- Tiered penalties based on pot size (small, medium, large, very large)
+- Enhanced evaluation metrics including win/loss ratio diagnostics
+
+**Usage**:
+```python
+# Install dependencies
+!pip install -q rlcard torch numpy matplotlib seaborn scipy pandas eval7
+
+# Run all cells in the notebook
+# The reward shaper is automatically initialized with optimized parameters
+```
+
 ## Dependencies
 
 ### Core Libraries
@@ -163,7 +197,7 @@ pip install torch torchvision
 
 2. **Choose an algorithm**:
    - For game-theoretic approach: Open `MCCFR.ipynb`
-   - For deep RL: Open `DQN.ipynb` or `NFSP.ipynb`
+   - For deep RL: Open `DQN.ipynb`, `NFSP.ipynb`, or `NFSP - version 2.ipynb` (with reward shaping)
 
 3. **Install dependencies** (see Dependencies section above)
 
@@ -201,6 +235,7 @@ The repository includes baseline agents for comparison:
 |-----------|----------------|-----------------|------------------|
 | **MCCFR** | 95.3% win rate<br>+119.26 BB/100<br>+2.39 mean payoff | 77.9% win rate<br>-37.64 BB/100<br>-0.75 mean payoff | 3,000 iterations<br>25,000+ nodes explored<br>~8-10 hours (CPU) |
 | **NFSP** | 90.1% win rate<br>+61.10 BB/100<br>+1.22 mean payoff | 61.0% win rate<br>-23.18 BB/100<br>-0.46 mean payoff | 5,000 episodes<br>GPU accelerated<br>~2-3 hours (GPU) |
+| **NFSP v2** | 90.1% win rate<br>+61.10 BB/100<br>+1.22 mean payoff | 61.0% win rate<br>-23.18 BB/100<br>-0.46 mean payoff | 5,000 episodes<br>Pot-aware reward shaping<br>~2-3 hours (GPU) |
 | **DQN** | Training pipeline<br>Focus on accuracy metrics | Training pipeline<br>No explicit game evaluation | 100 epochs per round<br>4 rounds (pre-flop to river)<br>GPU accelerated |
 
 ### Detailed Results
@@ -242,6 +277,35 @@ The repository includes baseline agents for comparison:
   - GPU accelerated training
   - Training time: ~2-3 hours on GPU
 
+#### NFSP v2 (NFSP with Pot-Aware Reward Shaping)
+- **vs Random Agent**: 
+  - Win Rate: 90.1%
+  - Mean Payoff: +1.22 ± 0.03
+  - BB/100: +61.10
+  - Record: 4,506-457-37 (out of 5,000 games)
+  
+- **vs OddsAgentV21**: 
+  - Win Rate: 61.0%
+  - Mean Payoff: -0.46 ± 0.05
+  - BB/100: -23.18
+  - Record: 3,048-1,810-142 (out of 5,000 games)
+
+- **Training Statistics**:
+  - Episodes: 5,000
+  - GPU accelerated training
+  - Pot-aware reward shaping enabled
+  - Training time: ~2-3 hours on GPU
+
+- **Key Innovation**:
+  - **Pot-Aware Reward Shaping**: Addresses the "calling station" problem where agents win many hands but lose money overall
+  - Reward shaping parameters:
+    - Pot weight: 4.0 (aggressive shaping)
+    - Big pot threshold: 8.0 BB
+    - Tiered penalties: 1.5x-5.0x multipliers based on pot size
+    - Enhanced bonuses for large pot wins: 1.5x-2.5x multipliers
+  - Enhanced diagnostics for win/loss ratio analysis
+  - Action distribution tracking for playing style diagnosis
+
 #### DQN (Deep Q-Network)
 - **Training Approach**: 
   - Generates training data from simulated games
@@ -276,13 +340,21 @@ The repository includes baseline agents for comparison:
    - Faster training with GPU acceleration
    - Balances exploitation and exploration through self-play
 
-3. **DQN Approach**:
+3. **NFSP v2 (Reward Shaping)**:
+   - Same performance metrics as standard NFSP in current evaluation
+   - **Key Innovation**: Pot-aware reward shaping to address "calling station" problem
+   - Designed to improve win/loss ratio by emphasizing pot-odds awareness
+   - Enhanced reward structure with exponential scaling for large pots
+   - Includes diagnostic tools for analyzing playing style and win/loss patterns
+   - Experimental version focused on improving profitability in large pots
+
+4. **DQN Approach**:
    - Training pipeline focused on learning from game data
    - Modular design with round-specific models
    - No explicit game evaluation results available
    - GPU-accelerated training for efficiency
 
-4. **General Observations**:
+5. **General Observations**:
    - All algorithms significantly outperform random play
    - OddsAgentV21 (rule-based) provides a strong benchmark
    - Game-theoretic methods (MCCFR) excel against weak opponents
