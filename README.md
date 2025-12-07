@@ -195,15 +195,99 @@ The repository includes baseline agents for comparison:
 
 ## Results Summary
 
-### MCCFR Performance
-- **vs Random Agent**: 95.3% win rate, +119.26 BB/100
-- **vs OddsAgentV21**: 77.9% win rate, -37.64 BB/100
-- **Training**: 3,000 iterations, 25,000+ nodes explored
+### Performance Comparison
+
+| Algorithm | vs Random Agent | vs OddsAgentV21 | Training Details |
+|-----------|----------------|-----------------|------------------|
+| **MCCFR** | 95.3% win rate<br>+119.26 BB/100<br>+2.39 mean payoff | 77.9% win rate<br>-37.64 BB/100<br>-0.75 mean payoff | 3,000 iterations<br>25,000+ nodes explored<br>~8-10 hours (CPU) |
+| **NFSP** | 90.1% win rate<br>+61.10 BB/100<br>+1.22 mean payoff | 61.0% win rate<br>-23.18 BB/100<br>-0.46 mean payoff | 5,000 episodes<br>GPU accelerated<br>~2-3 hours (GPU) |
+| **DQN** | Training pipeline<br>Focus on accuracy metrics | Training pipeline<br>No explicit game evaluation | 100 epochs per round<br>4 rounds (pre-flop to river)<br>GPU accelerated |
+
+### Detailed Results
+
+#### MCCFR (Monte Carlo Counterfactual Regret Minimization)
+- **vs Random Agent**: 
+  - Win Rate: 95.3%
+  - Mean Payoff: +2.39 ± 0.05
+  - BB/100: +119.26
+  - Record: 4,763-219-18 (out of 5,000 games)
+  
+- **vs OddsAgentV21**: 
+  - Win Rate: 77.9%
+  - Mean Payoff: -0.75 ± 0.12
+  - BB/100: -37.64
+  - Record: 3,896-1,053-51 (out of 5,000 games)
+
+- **Training Statistics**:
+  - Iterations: 3,000
+  - Total nodes explored: 25,000+
+  - Unique information sets: 217+
+  - Training time: ~8-10 hours on CPU
+
+#### NFSP (Neural Fictitious Self-Play)
+- **vs Random Agent**: 
+  - Win Rate: 90.1%
+  - Mean Payoff: +1.22 ± 0.03
+  - BB/100: +61.10
+  - Record: 4,506-457-37 (out of 5,000 games)
+  
+- **vs OddsAgentV21**: 
+  - Win Rate: 61.0%
+  - Mean Payoff: -0.46 ± 0.05
+  - BB/100: -23.18
+  - Record: 3,048-1,810-142 (out of 5,000 games)
+
+- **Training Statistics**:
+  - Episodes: 5,000
+  - GPU accelerated training
+  - Training time: ~2-3 hours on GPU
+
+#### DQN (Deep Q-Network)
+- **Training Approach**: 
+  - Generates training data from simulated games
+  - Trains separate feed-forward models for each betting round (pre-flop, flop, turn, river)
+  - Uses Q-learning to combine round-specific models
+  - Focuses on training accuracy rather than direct game evaluation
+  
+- **Training Statistics**:
+  - Training samples: 100,000+ per round
+  - Epochs: 100 per model
+  - Network architecture: 4 layers, 128 neurons, 0.5 dropout
+  - GPU accelerated training
+
+### Baseline Comparison (OddsAgentV21 vs Random)
+- **Win Rate**: 55.3% - 56.3%
+- **Mean Payoff**: +0.80 ± 0.04
+- **BB/100**: +39.87 - +42.33
+- This provides context for evaluating the RL agents' performance
 
 ### Key Insights
-- MCCFR demonstrates strong performance against random opponents
-- Game-theoretic approaches provide robust, unexploitable strategies
-- Deep RL methods offer faster training but may be more exploitable
+
+1. **MCCFR Performance**:
+   - Strongest performance against random opponents (95.3% win rate)
+   - Highest BB/100 against random (+119.26)
+   - Struggles against sophisticated opponents (OddsAgentV21)
+   - Game-theoretic approach provides robust, unexploitable strategies
+   - Requires significant computational time (CPU-based)
+
+2. **NFSP Performance**:
+   - Strong performance against random (90.1% win rate)
+   - Better performance against OddsAgentV21 than MCCFR (-23.18 vs -37.64 BB/100)
+   - Faster training with GPU acceleration
+   - Balances exploitation and exploration through self-play
+
+3. **DQN Approach**:
+   - Training pipeline focused on learning from game data
+   - Modular design with round-specific models
+   - No explicit game evaluation results available
+   - GPU-accelerated training for efficiency
+
+4. **General Observations**:
+   - All algorithms significantly outperform random play
+   - OddsAgentV21 (rule-based) provides a strong benchmark
+   - Game-theoretic methods (MCCFR) excel against weak opponents
+   - Deep RL methods (NFSP) show better adaptability to stronger opponents
+   - Training time varies significantly: MCCFR (CPU, slow) vs NFSP/DQN (GPU, faster)
 
 ## Contributing
 
