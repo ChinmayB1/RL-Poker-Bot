@@ -363,5 +363,10 @@ This project is open source and available under the MIT License.
 - The game theory and reinforcement learning research community
 
 ---
+## A project by:
+- Aarshia Gupta (aag022@ucsd.edu)
+- Chinmay Bharambe (cbharambe@ucsd.edu)
+- Ishaan Gosain (igosain@ucsd.edu)
+- Vedant Vardhaan (vvardhaan@ucsd.edu)
 
-**Note**: This project is for educational and research purposes. Poker involves real money gambling in many jurisdictions - please gamble responsibly and legally.
+**Under the Guidance of:** Professor Yian Ma (DSC 190 - Reinforcement Learning)
